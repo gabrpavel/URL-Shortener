@@ -9,7 +9,7 @@ import (
 
 type Config struct {
 	Env         string `yaml:"env" env-default:"local"`
-	StoragePath string `yaml:"storage_path" ebv-required:"true"`
+	StoragePath string `yaml:"storage_path" env-required:"true"`
 	HTTPServer  `yaml:"http_server"`
 }
 
@@ -25,6 +25,7 @@ func MustLoad() *Config {
 		log.Fatal("CONFIG_PATH is not set")
 	}
 
+	// check if file exists
 	if _, err := os.Stat(configPath); os.IsNotExist(err) {
 		log.Fatalf("config file does not exist: %s", configPath)
 	}

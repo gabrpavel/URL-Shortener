@@ -2,18 +2,53 @@ package main
 
 import (
 	"URL-Shortener/internal/config"
-	"fmt"
+	"URL-Shortener/internal/lib/logger/sl"
+	"URL-Shortener/internal/storage/sqlite"
+	"github.com/go-chi/chi/v5"
+	"log/slog"
+	"os"
+)
+
+const (
+	envLocal = "local"
+	envDev   = "dev"
+	envProd  = "prod"
 )
 
 func main() {
 	cfg := config.MustLoad()
-	fmt.Println(cfg)
 
-	// TODO: init logger: slog
+	log := setupLogger(cfg.Env)
 
-	// TODO: init storage: SQLite
+	log.Info("starting url-shortener", slog.String("env", cfg.Env))
+	log.Debug("debug messages are enabled")
 
-	// TODO: init router: chi, render
+	storage, err := sqlite.New(cfg.StoragePath)
+	if err != nil {
+		log.Error("failed to init storage", sl.Err(err))
+		os.Exit(1)
+	}
+
+	router := chi.NewRouter()
+
+	// middleware
 
 	// TODO: run server
+}
+
+func setupLogger(env string) *slog.Logger {
+
+	var log *slog.Logger
+	switch env {
+	case envLocal:
+		log = slog.New(
+			slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	case envDev:
+		log = slog.New(
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelDebug}))
+	case envProd:
+		log = slog.New(
+			slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	}
+	return log
 }
