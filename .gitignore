@@ -24,3 +24,5 @@ go.work
 .idea/
 
 /storage/storage.db
+/config/local.yaml
+./url-shortener
