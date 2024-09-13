@@ -50,7 +50,7 @@ jobs:
 
       - name: Copy docker-compose.yaml to remote server
         run: |
-          scp docker-compose.yaml gabr@89.169.167.200:/apps/url-shortener
+          scp docker-compose.yaml gabr@89.169.167.200:~/apps/url-shortener
 
       - name: Deploy
         run: |
