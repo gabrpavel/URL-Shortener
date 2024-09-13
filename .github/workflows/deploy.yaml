@@ -29,6 +29,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+      - name: Setup environment variables
+        run: |
+          echo APP_SECRET=${{ secrets.APP_SECRET }} >> .env
+          echo HTTP_SERVER_PASSWORD=${{ secrets.HTTP_SERVER_PASSWORD }} >> .env
+
       - name: Build and push Docker image
         run: |
           docker-compose build
