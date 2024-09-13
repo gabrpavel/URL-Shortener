@@ -65,4 +65,6 @@ jobs:
 #          ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "mv /tmp/url-shortener.service /etc/systemd/system/url-shortener.service"
       - name: Start application
         run: |
+          export CONFIG_PATH=config/prod.yaml 
+          export APP_SECRET=by3bwf4ibf0i 
           ssh -i deploy_key.pem -o StrictHostKeyChecking=no ${{ env.HOST }} "${{ env.DEPLOY_DIRECTORY }}/url-shortener"
