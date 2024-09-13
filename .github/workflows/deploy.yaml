@@ -59,5 +59,4 @@ jobs:
 
       - name: Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no gabr@89.169.167.200 "cd ~/apps/url-shortener && docker-compose down && docker pull ***/url-shortener:latest && docker-compose up -d"
-
+          ssh -o StrictHostKeyChecking=no gabr@89.169.167.200 "cd ~/apps/url-shortener && docker-compose down && docker pull ${{ secret.DOCKERHUB_USERNAME }}/url-shortener:latest && docker-compose up -d"
