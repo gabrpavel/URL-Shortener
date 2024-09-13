@@ -52,6 +52,13 @@ jobs:
         run: |
           scp docker-compose.yaml gabr@89.169.167.200:~/apps/url-shortener
 
+      - name: Add user to docker group on remote server
+        run: |
+          ssh -o StrictHostKeyChecking=no gabr@89.169.167.200 << EOF
+          sudo usermod -aG docker $USER
+          newgrp docker
+          EOF    
+
       - name: Deploy
         run: |
           ssh -o StrictHostKeyChecking=no gabr@89.169.167.200 << EOF
