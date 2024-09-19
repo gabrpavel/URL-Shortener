@@ -41,8 +41,8 @@ jobs:
 
       - name: Copy docker-compose.yaml and .env to remote server
         run: |
-          scp docker-compose.yaml ${{ env.HOST }}:~/apps/url-shortener/
-          scp .env ${{ env.HOST }}:~/apps/url-shortener/
+          scp -o StrictHostKeyChecking=no docker-compose.yaml ${{ env.HOST }}:~/apps/url-shortener/
+          scp -o StrictHostKeyChecking=no .env ${{ env.HOST }}:~/apps/url-shortener/
 
       - name: Deploy
         run: |
