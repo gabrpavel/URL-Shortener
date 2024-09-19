@@ -39,6 +39,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
+      - name: Setup environment variables
+        run: |
+          echo CONFIG_PATH==./config/prod.yaml >> .env
+          echo APP_SECRET=${{ secrets.APP_SECRET }} >> .env
+          echo HTTP_SERVER_PASSWORD=${{ secrets.HTTP_SERVER_PASSWORD }} >> .env
+
       - name: Copy docker-compose.yaml and .env to remote server
         run: |
           scp -o StrictHostKeyChecking=no docker-compose.yaml ${{ env.HOST }}:~/apps/url-shortener/ &&
