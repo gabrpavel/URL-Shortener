@@ -1,9 +1,9 @@
-FROM golang:1.22.3 as builder
+FROM golang:1.22.3
 
 WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN go build -o /url-shortener ./cmd/url-shortener
+RUN go build -o url-shortener ./cmd/url-shortener
 
-CMD ["/url-shortener"]
+ENTRYPOINT ["./url-shortener"]

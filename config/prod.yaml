@@ -7,6 +7,6 @@ http_server:
   user: "gabr"
 client:
   sso:
-    address: "localhost:44044"
+    address: "0.0.0.0:44044"
     timeout: 5s
-    retriesCount: 3
+    retriesCount: 4

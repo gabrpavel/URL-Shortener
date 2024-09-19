@@ -1,23 +1,23 @@
 name: Deploy to Production
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy'
+        required: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      HOST: gabr@130.193.55.93
+      IP: 130.193.55.93
+      VERSION: 0.0.1
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
 
       - name: Install Docker Compose
         run: |
@@ -29,34 +29,26 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Setup environment variables
-        run: |
-          echo APP_SECRET=${{ secrets.APP_SECRET }} >> .env
-          echo HTTP_SERVER_PASSWORD=${{ secrets.HTTP_SERVER_PASSWORD }} >> .env
-
       - name: Build and push Docker image
         run: |
-          docker-compose build
-          docker-compose push
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ env.VERSION }} .
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ env.VERSION }}
 
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.3
         with:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
 
-      - name: Disable strict host key checking
+      - name: Copy docker-compose.yaml and .env to remote server
         run: |
-          echo -e "Host 89.169.167.200\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-
-      - name: Copy docker-compose.yaml to remote server
-        run: |
-          scp docker-compose.yaml gabr@89.169.167.200:~/apps/url-shortener &&
-          scp .env gabr@89.169.167.200:~/apps/url-shortener/
-
-      - name: Add user to docker group on remote server
-        run: |
-          ssh -o StrictHostKeyChecking=no gabr@89.169.167.200 "sudo usermod -aG docker gabr && newgrp docker"
+          scp docker-compose.yaml ${{ env.HOST }}:~/apps/url-shortener/
+          scp .env ${{ env.HOST }}:~/apps/url-shortener/
 
       - name: Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no gabr@89.169.167.200 "cd ~/apps/url-shortener && docker-compose down && docker pull ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:latest && docker-compose up -d"
+          ssh -o StrictHostKeyChecking=no ${{ env.HOST }} << EOF
+          cd ~/apps/url-shortener
+          docker-compose down
+          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ env.VERSION }}
+          docker-compose up -d
+          EOF
