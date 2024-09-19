@@ -41,7 +41,7 @@ jobs:
 
       - name: Setup environment variables
         run: |
-          echo CONFIG_PATH==./config/prod.yaml >> .env
+          echo CONFIG_PATH=./config/prod.yaml >> .env
           echo APP_SECRET=${{ secrets.APP_SECRET }} >> .env
           echo HTTP_SERVER_PASSWORD=${{ secrets.HTTP_SERVER_PASSWORD }} >> .env
 
