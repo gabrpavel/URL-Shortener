@@ -41,14 +41,9 @@ jobs:
 
       - name: Copy docker-compose.yaml and .env to remote server
         run: |
-          scp -o StrictHostKeyChecking=no docker-compose.yaml ${{ env.HOST }}:~/apps/url-shortener/
+          scp -o StrictHostKeyChecking=no docker-compose.yaml ${{ env.HOST }}:~/apps/url-shortener/ &&
           scp -o StrictHostKeyChecking=no .env ${{ env.HOST }}:~/apps/url-shortener/
 
       - name: Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ env.HOST }} << EOF
-          cd ~/apps/url-shortener
-          docker-compose down
-          docker pull ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ env.VERSION }}
-          docker-compose up -d
-          EOF
+          ssh -o StrictHostKeyChecking=no ${{ env.HOST }} "cd ~/apps/url-shortener && docker-compose down && docker pull ${{ secrets.DOCKERHUB_USERNAME }}/url-shortener:${{ env.VERSION }} && docker-compose up -d"
