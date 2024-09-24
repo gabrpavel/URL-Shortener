@@ -8,6 +8,7 @@ import (
 	"URL-Shortener/internal/http-server/handlers/url/save"
 	"URL-Shortener/internal/lib/logger/handlers/slogpretty"
 	"URL-Shortener/internal/lib/logger/sl"
+	"URL-Shortener/internal/metrics"
 	"URL-Shortener/internal/storage/sqlite"
 	"context"
 	"github.com/go-chi/chi/v5"
@@ -17,6 +18,7 @@ import (
 	"os"
 
 	mwLogger "URL-Shortener/internal/http-server/middleware/logger"
+	mwMetrics "URL-Shortener/internal/http-server/middleware/metrics"
 )
 
 const (
@@ -51,11 +53,16 @@ func main() {
 		os.Exit(1)
 	}
 
+	go func() {
+		_ = metrics.Listen("0.0.0.0:8081")
+	}()
+
 	router := chi.NewRouter()
 
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Logger)
 	router.Use(mwLogger.New(log))
+	router.Use(mwMetrics.MetricsMiddleware)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 
